@@ -9,15 +9,16 @@
 </head>
 <body>
 
+    <!-- НЕВИДИМЫЙ АУДИОЭЛЕМЕНТ ДЛЯ РАЗБЛОКИРОВКИ -->
+    <audio id="unlock-audio" src="audio.m4a" preload="auto"></audio>
+
     <header>
         <h1>СЛОВО ПАЦАНА</h1>
         <p>Кровь на асфальте • Казань, 1989</p>
         
-        <!-- Блок с кнопкой и плеером -->
         <div style="margin-bottom: 15px;">
             <button id="music-toggle" class="action-btn" style="padding: 10px 20px; font-size: 1em; background-color: #222;">🎵 ВКЛЮЧИТЬ МУЗЫКУ</button>
             
-            <!-- Плеер -->
             <div id="music-player-container" style="display: none; margin: 15px auto 0 auto; max-width: 300px;">
                 <audio id="bg-music" src="Пыяла - АИГЕЛ.mp3" loop controls style="width: 100%;"></audio>
             </div>
@@ -32,7 +33,6 @@
 
     <main>
 
-        <!-- Блок 1: Легендарные цитаты -->
         <section class="content-block">
             <h2>1. Фразы, которые знают все</h2>
             <p>Эти слова разлетелись на мемы и стали частью современной культуры.</p>
@@ -53,7 +53,6 @@
             </div>
         </section>
 
-        <!-- Блок 2: Галерея кадров -->
         <section class="content-block">
             <h2>2. Дух времени в кадрах</h2>
             <p>Спортивные костюмы, панельки, магнитофоны и суровые взгляды. Вот она — эстетика конца 80-х.</p>
@@ -68,12 +67,10 @@
             </div>
         </section>
 
-        <!-- Блок 3: Финальная проверка -->
         <section class="content-block">
             <p class="highlight">«Пацан сказал — пацан сделал».</p>
             <div style="text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                 <a href="index.html" class="action-btn">← На главную</a>
-                <!-- Кнопка перехода к финальной проверке -->
                 <a href="final.html" class="action-btn trigger-final-quiz" style="background-color: #b33939;">Пройти финальную проверку →</a>
             </div>
         </section>
@@ -90,14 +87,12 @@
         <div class="modal-content">
             <h2>ФИНАЛЬНЫЙ ВОПРОС</h2>
             
-            <!-- ФОТО КОЩЕЯ -->
             <div class="koshchey-photo">
                 <img src="https://i.pinimg.com/736x/24/e5/53/24e553b035dfe617e23d00705896c762.jpg" alt="Кощей" style="max-width: 200px; border: 3px solid #111; box-shadow: 5px 5px 0px #b33939; margin-bottom: 15px; filter: grayscale(1);">
             </div>
 
             <p style="font-weight: bold; font-size: 1.1em; margin-top: 10px;">Наезжает на тебя Кащей. Че будешь делать?</p>
             
-            <!-- Варианты ответов -->
             <button class="action-btn final-btn" data-correct="false" style="display: block; width: 100%; margin: 10px 0; font-size: 1em;">А) Прогнусь под него, отдам телефон</button>
             <button class="action-btn final-btn" data-correct="true" style="display: block; width: 100%; margin: 10px 0; font-size: 1em;">Б) Отшиваю Кащея и стою за себя</button>
             
@@ -107,19 +102,30 @@
         </div>
     </div>
 
-    <!-- СКРИПТЫ -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- РАЗБЛОКИРОВКА ЗВУКА ПРИ КАСАНИИ ---
+            const unlockAudio = document.getElementById('unlock-audio');
+            if (unlockAudio) {
+                document.addEventListener('touchstart', function unlock() {
+                    unlockAudio.play().then(() => {
+                        unlockAudio.pause();
+                        unlockAudio.currentTime = 0;
+                    }).catch(e => {});
+                    document.removeEventListener('touchstart', unlock);
+                }, { once: true });
+            }
+
             // --- ЗВУК КЛИКА ---
             const clickSound = new Audio('audio.m4a');
             clickSound.volume = 1.0; 
 
             function playClick() {
                 clickSound.currentTime = 0; 
-                clickSound.play().catch(e => console.log("Звук клика заблокирован:", e));
+                clickSound.play().catch(e => console.log("Клик заблокирован:", e));
             }
 
-            // --- 1. МУЗЫКА (С РАЗБЛОКИРОВКОЙ ДЛЯ ТЕЛЕФОНОВ) ---
+            // --- 1. МУЗЫКА ---
             const musicBtn = document.getElementById('music-toggle');
             const bgMusic = document.getElementById('bg-music');
             const playerContainer = document.getElementById('music-player-container');
@@ -135,10 +141,7 @@
                     musicBtn.textContent = "⏹ ВЫКЛЮЧИТЬ МУЗЫКУ";
                     musicBtn.style.backgroundColor = "#b33939";
                     
-                    // Пытаемся включить сразу
                     bgMusic.play().catch(e => {
-                        console.log("Автовоспроизведение заблокировано, ждем касания.");
-                        // Если телефон блокирует, ждем первого касания экрана
                         document.addEventListener('touchstart', function unlockMusic() {
                             bgMusic.play().catch(e => {});
                             document.removeEventListener('touchstart', unlockMusic);

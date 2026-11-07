@@ -11,6 +11,8 @@
 
     <!-- Скрытые аудиофайлы -->
     <audio id="siren-sound" src="siren.m4a" preload="auto"></audio>
+    <!-- Невидимый аудиоэлемент для разблокировки звука на телефоне -->
+    <audio id="unlock-audio" src="audio.m4a" preload="auto"></audio>
 
     <header>
         <h1>СЛОВО ПАЦАНА</h1>
@@ -111,6 +113,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- РАЗБЛОКИРОВКА ЗВУКА ПРИ КАСАНИИ ---
+            const unlockAudio = document.getElementById('unlock-audio');
+            if (unlockAudio) {
+                document.addEventListener('touchstart', function unlock() {
+                    unlockAudio.play().then(() => {
+                        unlockAudio.pause();
+                        unlockAudio.currentTime = 0;
+                    }).catch(e => {});
+                    document.removeEventListener('touchstart', unlock);
+                }, { once: true });
+            }
+
             // --- ЗВУК КЛИКА ---
             const clickSound = new Audio('audio.m4a');
             clickSound.volume = 1.0;
@@ -120,7 +134,7 @@
                 clickSound.play().catch(e => console.log("Звук клика заблокирован:", e));
             }
 
-            // --- 1. МУЗЫКА (С РАЗБЛОКИРОВКОЙ ДЛЯ ТЕЛЕФОНОВ) ---
+            // --- 1. МУЗЫКА ---
             const musicBtn = document.getElementById('music-toggle');
             const bgMusic = document.getElementById('bg-music');
             const playerContainer = document.getElementById('music-player-container');
@@ -136,10 +150,8 @@
                     musicBtn.textContent = "⏹ ВЫКЛЮЧИТЬ МУЗЫКУ";
                     musicBtn.style.backgroundColor = "#b33939";
                     
-                    // Пытаемся включить сразу
                     bgMusic.play().catch(e => {
-                        console.log("Автовоспроизведение заблокировано, ждем касания.");
-                        // Если телефон блокирует, ждем первого касания экрана
+                        // Ждем первого касания
                         document.addEventListener('touchstart', function unlockMusic() {
                             bgMusic.play().catch(e => {});
                             document.removeEventListener('touchstart', unlockMusic);

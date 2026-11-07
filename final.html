@@ -14,6 +14,8 @@
     <audio id="welcome-sound" src="ulic4a-5.mp3" preload="auto"></audio>
     <!-- Звук клика -->
     <audio id="click-sound" src="audio.m4a" preload="auto"></audio>
+    <!-- НЕВИДИМЫЙ АУДИОЭЛЕМЕНТ ДЛЯ РАЗБЛОКИРОВКИ -->
+    <audio id="unlock-audio" src="audio.m4a" preload="auto"></audio>
 
     <header>
         <h1>ЭКЗАМЕН СДАН</h1>
@@ -71,6 +73,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Находим элементы
             const clickSound = document.getElementById('click-sound');
+            const unlockAudio = document.getElementById('unlock-audio');
             const bgMusic = document.getElementById('bg-music');
             const musicBtn = document.getElementById('music-toggle');
             const playerContainer = document.getElementById('music-player-container');
@@ -86,24 +89,15 @@
             }
 
             // --- РАЗБЛОКИРОВКА ЗВУКОВ ЧЕРЕЗ КАСАНИЕ (ДЛЯ ТЕЛЕФОНОВ) ---
-            document.addEventListener('touchstart', function unlockSounds() {
-                // Разблокируем фанфары
-                if (welcomeSound && welcomeSound.paused) {
-                    welcomeSound.play().then(() => {
-                        welcomeSound.pause(); 
-                        welcomeSound.currentTime = 0;
+            if (unlockAudio) {
+                document.addEventListener('touchstart', function unlock() {
+                    unlockAudio.play().then(() => {
+                        unlockAudio.pause();
+                        unlockAudio.currentTime = 0;
                     }).catch(e => {});
-                }
-                // Разблокируем клик
-                if (clickSound) {
-                    clickSound.play().then(() => {
-                        clickSound.pause();
-                        clickSound.currentTime = 0;
-                    }).catch(e => {});
-                }
-                document.removeEventListener('touchstart', unlockSounds);
-            }, { once: true });
-
+                    document.removeEventListener('touchstart', unlock);
+                }, { once: true });
+            }
 
             // --- 1. ЗВУК ТРИУМФА (ФАНФАРЫ) ---
             if (welcomeSound) {
@@ -140,7 +134,7 @@
 
             if (musicBtn && bgMusic) {
                 musicBtn.addEventListener('click', () => {
-                    playClick(); // Звук клика
+                    playClick(); 
 
                     if (!bgMusic.paused) {
                         bgMusic.pause();
